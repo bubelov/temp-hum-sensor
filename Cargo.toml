@@ -1,0 +1,23 @@
+[package]
+name = "temp-hum-sensor"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# base dependency, esp hardware abstractions
+# https://github.com/esp-rs/esp-hal/releases
+esp-hal = { version = "1.0.0-rc.1", features = ["esp32c6"] }
+# logging implementation (log 0.4 is the facade)
+# https://crates.io/crates/esp-println
+esp-println = { version = "0.16.0", features = ["esp32c6", "log-04"] }
+# second stage bootloader
+# https://crates.io/crates/esp-bootloader-esp-idf
+esp-bootloader-esp-idf = { version = "0.3.0", features = ["esp32c6"] }
+# logging facade
+# https://github.com/rust-lang/log/releases
+log = { version = "0.4.28" }
+
+[profile.release]
+codegen-units = 1
+lto = 'fat'
+opt-level = 's'
