@@ -2,7 +2,9 @@
 #![no_main]
 
 use crate::sht3x::Sht3x;
+use core::cell::RefCell;
 use core::panic::PanicInfo;
+use embedded_hal_bus::i2c::RefCellDevice;
 use esp_hal::gpio::{Level, Output, OutputConfig};
 use esp_hal::i2c::master::{Config, I2c};
 use esp_hal::main;
@@ -10,6 +12,16 @@ use esp_hal::time::{Duration, Instant};
 use esp_println::logger::init_logger;
 use log::{error, info};
 mod sht3x;
+
+#[cfg(feature = "display")]
+use {
+    embedded_graphics::draw_target::DrawTarget,
+    embedded_graphics::pixelcolor::BinaryColor,
+    ssd1306::mode::DisplayConfig,
+    ssd1306::prelude::DisplayRotation,
+    ssd1306::size::DisplaySize128x64,
+    ssd1306::{I2CDisplayInterface, Ssd1306},
+};
 
 esp_bootloader_esp_idf::esp_app_desc!();
 
@@ -35,9 +47,22 @@ fn main() -> ! {
         .expect("i2c init failed")
         .with_sda(i2c_sda_pin)
         .with_scl(i2c_scl_pin);
+    let i2c_refcell = RefCell::new(i2c);
     info!("i2c init complete");
 
-    let mut sht3x = Sht3x::new(i2c, Sht3x::DEFAULT_ADDR);
+    let mut sht3x = Sht3x::new(RefCellDevice::new(&i2c_refcell), 0x44);
+
+    #[cfg(feature = "display")]
+    {
+        let mut i2c_borrow = i2c_refcell.borrow_mut();
+        let interface = I2CDisplayInterface::new(&mut *i2c_borrow);
+        let mut display = Ssd1306::new(interface, DisplaySize128x64, DisplayRotation::Rotate0)
+            .into_buffered_graphics_mode();
+        display.init().unwrap();
+        display.set_display_on(true).unwrap();
+        display.clear(BinaryColor::On).unwrap();
+        display.flush().unwrap();
+    }
 
     loop {
         led.toggle();
@@ -64,6 +89,6 @@ fn panic(info: &PanicInfo) -> ! {
     if let Some(location) = info.location() {
         error!("File: {}:{}", location.file(), location.line());
     }
-    error!("Reason: {}", info.message());    
+    error!("Reason: {}", info.message());
     loop {}
 }

@@ -1,16 +1,16 @@
-use esp_hal::{i2c::master::I2c, Blocking};
-
-pub struct Sht3x<'d> {
-    i2c: I2c<'d, Blocking>,
+pub struct Sht3x<I2C> {
+    pub i2c: I2C,
     address: u8,
 }
 
 // https://sensirion.com/media/documents/213E6A3B/63A5A569/Datasheet_SHT3x_DIS.pdf
-impl<'d> Sht3x<'d> {
-    pub const DEFAULT_ADDR: u8 = 0x44;
+impl<I2C> Sht3x<I2C>
+where
+    I2C: embedded_hal::i2c::I2c,
+{
     pub const CMD_MEASURE: [u8; 2] = [0x2C, 0x06];
 
-    pub fn new(i2c: I2c<'d, Blocking>, address: u8) -> Self {
+    pub fn new(i2c: I2C, address: u8) -> Self {
         Self { i2c, address }
     }
 
