@@ -8,22 +8,24 @@ default = []
 display = ["dep:ssd1306", "dep:embedded-graphics"]
 
 [dependencies]
-embedded-hal = "1.0.0"
-# base dependency, esp hardware abstractions
-# https://github.com/esp-rs/esp-hal/releases
-esp-hal = { version = "1.0.0-rc.1", features = ["esp32c6"] }
-# logging implementation (log 0.4 is the facade)
-# https://crates.io/crates/esp-println
-esp-println = { version = "0.16.0", features = ["esp32c6", "log-04"] }
-# second stage bootloader
-# https://crates.io/crates/esp-bootloader-esp-idf
-esp-bootloader-esp-idf = { version = "0.3.0", features = ["esp32c6"] }
-# logging facade
-# https://github.com/rust-lang/log/releases
-log = { version = "0.4.28" }
+# highest level embedded abstraction
+# https://github.com/rust-embedded/embedded-hal/releases
+embedded-hal = { version = "1.0.0", default-features = false }
 # i2c bus sharing
 # https://github.com/rust-embedded/embedded-hal/blob/master/embedded-hal-bus/CHANGELOG.md
-embedded-hal-bus = "0.3.0"
+embedded-hal-bus = { version = "0.3.0", default-features = false }
+# esp hardware abstractions
+# https://github.com/esp-rs/esp-hal/releases
+esp-hal = { version = "1.0.0", features = ["rt", "esp32c6"], default-features = false }
+# logging implementation (log 0.4 is the facade)
+# https://crates.io/crates/esp-println
+esp-println = { version = "0.16.0", features = ["esp32c6", "log-04", "jtag-serial", "colors", "critical-section"], default-features = false }
+# second stage bootloader
+# https://crates.io/crates/esp-bootloader-esp-idf
+esp-bootloader-esp-idf = { version = "0.3.0", features = ["esp32c6"], default-features = false }
+# logging facade
+# https://github.com/rust-lang/log/releases
+log = { version = "0.4.28", default-features = false }
 
 ssd1306 = { version = "0.10.0", optional = true }
 embedded-graphics = { version = "0.8.1", optional = true }
