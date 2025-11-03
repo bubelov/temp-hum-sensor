@@ -4,22 +4,30 @@
 use crate::sht3x::Sht3x;
 use core::cell::RefCell;
 use core::panic::PanicInfo;
+use embedded_graphics::mono_font::MonoTextStyle;
+use embedded_graphics::mono_font::ascii::FONT_9X18_BOLD;
+use embedded_graphics::prelude::{Point, Size};
+use embedded_graphics::primitives::Rectangle;
 use embedded_hal_bus::i2c::RefCellDevice;
+use embedded_text::TextBox;
+use embedded_text::alignment::HorizontalAlignment;
+use embedded_text::style::{HeightMode, TextBoxStyleBuilder};
 use esp_hal::gpio::{Level, Output, OutputConfig};
 use esp_hal::i2c::master::{Config, I2c};
 use esp_hal::main;
 use esp_hal::time::{Duration, Instant};
 use esp_println::logger::init_logger;
+use heapless::String;
 use log::{error, info};
 mod sht3x;
-
-#[cfg(feature = "display")]
+use core::fmt::Write;
+use embedded_graphics::Drawable;
 use {
     embedded_graphics::draw_target::DrawTarget,
     embedded_graphics::pixelcolor::BinaryColor,
     ssd1306::mode::DisplayConfig,
     ssd1306::prelude::DisplayRotation,
-    ssd1306::size::DisplaySize128x64,
+    ssd1306::size::DisplaySize128x32,
     ssd1306::{I2CDisplayInterface, Ssd1306},
 };
 
@@ -52,17 +60,28 @@ fn main() -> ! {
 
     let mut sht3x = Sht3x::new(RefCellDevice::new(&i2c_refcell), 0x44);
 
-    #[cfg(feature = "display")]
-    {
-        let mut i2c_borrow = i2c_refcell.borrow_mut();
-        let interface = I2CDisplayInterface::new(&mut *i2c_borrow);
-        let mut display = Ssd1306::new(interface, DisplaySize128x64, DisplayRotation::Rotate0)
-            .into_buffered_graphics_mode();
-        display.init().unwrap();
-        display.set_display_on(true).unwrap();
-        display.clear(BinaryColor::On).unwrap();
-        display.flush().unwrap();
-    }
+    let display_interface = I2CDisplayInterface::new(RefCellDevice::new(&i2c_refcell));
+    let mut display = Ssd1306::new(
+        display_interface,
+        DisplaySize128x32,
+        DisplayRotation::Rotate0,
+    )
+    .into_buffered_graphics_mode();
+
+    let text_style = MonoTextStyle::new(&FONT_9X18_BOLD, BinaryColor::On);
+
+    let textbox_style = TextBoxStyleBuilder::new()
+        .alignment(HorizontalAlignment::Center)
+        .vertical_alignment(embedded_text::alignment::VerticalAlignment::Middle)
+        .height_mode(HeightMode::FitToText)
+        .build();
+
+    display.init().unwrap();
+    display.set_display_on(true).unwrap();
+    display.clear(BinaryColor::Off).unwrap();
+    display.flush().unwrap();
+
+    let mut buffer: String<32> = String::new();
 
     loop {
         led.toggle();
@@ -72,6 +91,26 @@ fn main() -> ! {
             "temp: {} | hum: {}",
             measurement.temp_celsius, measurement.humidity_percent
         );
+
+        buffer.clear();
+        write!(
+            buffer,
+            "{:.1}C\n{:.1}%",
+            measurement.temp_celsius, measurement.humidity_percent
+        )
+        .unwrap();
+
+        display.clear(BinaryColor::Off).unwrap();
+        display.flush().unwrap();
+        TextBox::with_textbox_style(
+            &buffer,
+            Rectangle::new(Point::new(0, 0), Size::new(128, 32)),
+            text_style,
+            textbox_style,
+        )
+        .draw(&mut display)
+        .unwrap();
+        display.flush().unwrap();
 
         // dev builds should use delay
         let delay_start = Instant::now();

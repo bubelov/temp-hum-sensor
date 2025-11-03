@@ -3,10 +3,6 @@ name = "temp-hum-sensor"
 version = "0.1.0"
 edition = "2024"
 
-[features]
-default = []
-display = ["dep:ssd1306", "dep:embedded-graphics"]
-
 [dependencies]
 # highest level embedded abstraction
 # https://github.com/rust-embedded/embedded-hal/releases
@@ -27,8 +23,10 @@ esp-bootloader-esp-idf = { version = "0.3.0", features = ["esp32c6"], default-fe
 # https://github.com/rust-lang/log/releases
 log = { version = "0.4.28", default-features = false }
 
-ssd1306 = { version = "0.10.0", optional = true }
-embedded-graphics = { version = "0.8.1", optional = true }
+ssd1306 = { version = "0.10.0" }
+embedded-graphics = { version = "0.8.1" }
+embedded-text = { version = "0.7.3" }
+heapless = "0.8"
 
 [profile.release]
 codegen-units = 1
