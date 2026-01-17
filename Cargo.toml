@@ -15,18 +15,25 @@ embedded-hal-bus = { version = "0.3.0", default-features = false }
 esp-hal = { version = "1.0.0", features = ["rt", "esp32c6"], default-features = false }
 # logging implementation (log 0.4 is the facade)
 # https://crates.io/crates/esp-println
-esp-println = { version = "0.16.0", features = ["esp32c6", "log-04", "jtag-serial", "colors", "critical-section"], default-features = false }
+esp-println = { version = "0.16.1", features = ["esp32c6", "log-04", "jtag-serial", "colors", "critical-section"], default-features = false }
 # second stage bootloader
 # https://crates.io/crates/esp-bootloader-esp-idf
-esp-bootloader-esp-idf = { version = "0.3.0", features = ["esp32c6"], default-features = false }
+esp-bootloader-esp-idf = { version = "0.4.0", features = ["esp32c6"], default-features = false }
 # logging facade
 # https://github.com/rust-lang/log/releases
-log = { version = "0.4.28", default-features = false }
-
+log = { version = "0.4.29", default-features = false }
+# ssd1306 display driver
+# https://github.com/rust-embedded-community/ssd1306/blob/master/CHANGELOG.md
 ssd1306 = { version = "0.10.0" }
+# graphics primitives
+# https://github.com/embedded-graphics/embedded-graphics/blob/master/CHANGELOG.md
 embedded-graphics = { version = "0.8.1" }
+# textbox widget
+# https://github.com/embedded-graphics/embedded-text/blob/master/CHANGELOG.md
 embedded-text = { version = "0.7.3" }
-heapless = "0.8"
+# heapless strings
+# https://github.com/rust-embedded/heapless/blob/main/CHANGELOG.md
+heapless = "0.9.2"
 
 [profile.release]
 codegen-units = 1
