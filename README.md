@@ -3,6 +3,7 @@
 ## Hardware:
 
 - [XIAO ESP32C6](https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/#hardware-overview)
+- [Expansion Board Base for XIAO](https://wiki.seeedstudio.com/Seeeduino-XIAO-Expansion-Board/)
 - [SHT3X](https://sensirion.com/media/documents/213E6A3B/63A5A569/Datasheet_SHT3x_DIS.pdf)
 
 ## Wiring
@@ -32,17 +33,12 @@ INFO - initializing led
 INFO - led init complete
 INFO - initializing i2c
 INFO - i2c init complete
-INFO - temp: 25.424583 | hum: 73.21278
-INFO - temp: 25.437935 | hum: 73.153275
-INFO - temp: 25.437935 | hum: 73.112076
-INFO - temp: 25.437935 | hum: 73.153275
+INFO - temp: 25.10147 | hum: 31.94934
+INFO - temp: 25.074768 | hum: 31.961548
+INFO - temp: 25.10147 | hum: 31.94934
+INFO - temp: 25.08812 | hum: 31.976807
 ```
-
-The built-in LED should blink every second to indicate healty activity.
 
 ## Roadmap
 
-- Add Zigbee support
-- Add optional E-Ink display support
-- Add a LiFePo4 battery
 - Design a 3D printable case
